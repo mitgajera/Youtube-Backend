@@ -4,5 +4,5 @@ import { registerUser } from "../controllers/user.controller.js";
 
 
 const router = express.Router();
-router.post('/register', asyncHandle(registerUser));
+router.post('/register', asyncHandler(registerUser));
 export default router;
