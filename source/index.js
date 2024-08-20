@@ -1,17 +1,20 @@
+import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
 
 dotenv.config({
-    path: './env'
+    path: './.env'
 })
 
+const app = express();
+
+const DB_NAME = "../constants.js"
+const port = process.env.PORT || 8000;
 connectDB()
+
 .then(() =>{
-    app.listen(process.env.PORT, () => {
-        console.log(`App is listenig on port ${process.env.PORT}`);
-    })
-    app.listen(process.env.PORT || 8000, () => {
-        console.log(`Server is running on port ${process.env.PORT || 8000}`)
+    app.listen(port, () => {
+        console.log(`App is listening on port : ${port}`);
     })
 })
 .catch((err) => {
