@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary"
-import fs from "fs"
+import fs, { unlinkSync } from "fs"
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,16 +15,13 @@ const uploadOnCloudinary = async (localFilePath) => {
             resource_type: "auto",
         })
 
-        console.log("File is uploaded on cloudinary", responce.url);
+        // console.log("File is uploaded on cloudinary", responce.url);
+        fs.unlinkSync(localFilePath);
         return responce.url;
     }catch(error){
         fs.unlinkSync(localFilePath)
         return null
     }
 }
-
-cloudinary.uploader.upload('https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg',
-    { public_id: 'shoes', },
-    function (error, result) { console.log(result); })
 
 export{uploadOnCloudinary}
