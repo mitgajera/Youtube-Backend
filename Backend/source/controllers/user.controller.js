@@ -282,7 +282,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler((req, res) => {
     return res
         .status(200)
-        .json(200, req.user, "Current user fetched successfully")
+        .json(new ApiResponse(200, req.user, "Current user fetched successfully"))
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -309,59 +309,89 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 })
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
-    const avatarLocalPath = req.file?.path
+    await deleteOldAvatar(req, res, async () => {
+        const avatarLocalPath = req.file?.path;
+        if (!avatarLocalPath) {
+            throw new ApiError(400, "Avatar file is missing");
+        }
+        const avatar = await uploadOnCloudinary(avatarLocalPath);
+        if (!avatar.url) {
+            throw new ApiError(400, "Error while uploading avatar");
+        }
+        const user = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $set: {
+                    avatar: avatar.url
+                }
+            },
+            { new: true }
+        ).select("-password");
+        return res
+            .status(200)
+            .json(new ApiResponse(200, user, "Avatar updated successfully"));
+    });
+});
 
-    if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar file is missing")
+const deleteOldAvatar = asyncHandler(async (req, res, next) => {
+    const user = await user.findById(req.user._id)
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
     }
-
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
-
-    if (!avatar.url) {
-        throw new ApiError(400, "Error ehile uploading on avatar")
+    const oldAvatarUrl = user.oldAvatarUrl;
+    if (oldAvatarUrl) {
+        try {
+            await cloudinary.v2.uploader.destroy(oldAvatarUrl);
+        }
+        catch (error) {
+            throw new ApiError(500, "Error deleting old avatar");
+        }
     }
-
-    const user = await User.findByIdAndUpdate(
-        req.user?._id,
-        {
-            $set: {
-                avatar: avatar.url
-            }
-        },
-        { new: true }
-    ).select("-password")
-
-    return res
-        .status(200)
-        .json(200, user, "Avatar updated successfully")
+    next();
 })
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
-    const coverImageLocalPath = req.file?.path
+    await deleteOldCoverImage(req, res, async () => {
+        const coverImageLocalPath = req.file?.path;
+        if (!coverImageLocalPath) {
+            throw new ApiError(400, "Cover image file is missing");
+        }
+        const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+        if (!coverImage.url) {
+            throw new ApiError(400, "Error while uploading cover image");
+        }
+        const user = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $set: {
+                    coverImage: coverImage.url
+                }
+            },
+            { new: true }
+        ).select("-password");
+        return res
+            .status(200)
+            .json(new ApiResponse(200, user, "Cover image updated successfully"));
+    });
+});
 
-    if (!coverImageLocalPath) {
-        throw new ApiError(400, "Cover image file is missing")
+const deleteOldCoverImage = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
     }
-
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
-
-    if (!coverImage.url) {
-        throw new ApiError(400, "Error ehile uploading on cover image")
+    const oldCoverImageUrl = user.coverImageUrl;
+    if (oldCoverImageUrl) {
+        try {
+            await cloudinary.v2.uploader.destroy(oldCoverImageUrl);
+        }
+        catch (error) {
+            throw new ApiError(500, "Error deleting old cover image");
+        }
     }
-
-    const user = await User.findByIdAndUpdate(
-        req.user?._id,
-        {
-            $set: {
-                coverImage: coverImage.url
-            }
-        },
-        { new: true }
-    ).select("-password")
-
-    return res
-        .status(200)
-        .json(200, user, "Cover image updated successfully")
+    next();
 })
 
 export {
