@@ -4,12 +4,17 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
         const user = await User.findById(userId)
-        const accessToken = user.generateAccessToken()
-        const refreshToken = user.generateRefreshToken()
+        const accessToken = jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, {
+            expiresIn: '60m', 
+          });
+          const refreshToken = jwt.sign({ _id: user._id }, process.env.REFRESH_TOKEN_SECRET, {
+            expiresIn: '30d', 
+          });
 
         user.refreshToken = refreshToken
         await user.save({ validateBeforeSave: false })
@@ -143,19 +148,6 @@ const loginUser = asyncHandler(async (req, res) => {
         secure: true
     }
 
-    const signedAccessToken = jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: '15s'
-    });
-
-    try {
-        await res.cookie('accessToken', signedAccessToken, {
-            httpOnly: true,
-            secure: true
-        });
-    } catch (error) {
-        console.error(error);
-        throw new ApiError(500, "Error setting access token cookie");
-    }
 
     const refreshTokenValue = await refreshToken;
 
@@ -167,21 +159,22 @@ const loginUser = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 {
-                    user: loggedInUser, accessToken: signedAccessToken,
-                    refreshToken: refreshTokenValue,
+                    user: loggedInUser,
+                    accessToken: accessToken,
+                    refreshToken: refreshTokenValue
                 },
                 "User logged in successfully"
             )
         )
-}
+    }
 )
 
 const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $unset: {
+                refreshToken: 1
             }
         },
         {
@@ -203,7 +196,7 @@ const logoutUser = asyncHandler(async (req, res) => {
                 "User logged out successfully"
             )
         )
-}
+    }
 )
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -234,16 +227,16 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             secure: true
         }
 
-        const { accessToken, newRefreshToken } = await generateAccessAndRefereshTokens(user._id)
+        const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id)
 
         return res
             .status(200)
             .cookie("accessToken", accessToken, options)
-            .cookie("refreshToken", newRefreshToken, options)
+            .cookie("refreshToken", refreshToken, options)
             .json(
                 new ApiResponse(
                     200,
-                    { accessToken, refreshToken: newRefreshToken },
+                    { accessToken, refreshToken: refreshToken },
                     "Access token refreshed"
                 )
             )
@@ -286,26 +279,32 @@ const getCurrentUser = asyncHandler((req, res) => {
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-    const { fullName, email } = req.body
-
-    if (!fullName || !email) {
-        throw new ApiError(400, "All fields are required")
+    try {
+        const { fullName, email } = req.body
+    
+        if (!fullName || !email) {
+            throw new ApiError(400, "All fields are required")
+        }
+    
+        const user = await User.findByIdAndUpdate(
+            req.user?._id,
+            {
+                $set: {
+                    fullName: fullName,
+                    email: email,
+                }
+            },
+            { new: true }
+        ).select("-password")
+    
+        return res
+            .status(200)
+            .json(new ApiResponse(200, user, "Account details updated successfully"))
+    } catch (error) {
+        return res
+        .status(400)
+        .json(new ApiResponse(400, "Error updating account details"))  
     }
-
-    const user = await User.findByIdAndUpdate(
-        req.user?._id,
-        {
-            $set: {
-                fullName: fullName,
-                email: email,
-            }
-        },
-        { new: true }
-    ).select("-password")
-
-    return res
-        .status(200)
-        .json(new ApiResponse(200, user, "Account details updated successfully"))
 })
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
@@ -314,22 +313,27 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         if (!avatarLocalPath) {
             throw new ApiError(400, "Avatar file is missing");
         }
-        const avatar = await uploadOnCloudinary(avatarLocalPath);
-        if (!avatar.url) {
+        console.log(`Uploading avatar to Cloudinary: ${avatarLocalPath}`);
+        try {
+            const avatar = await uploadOnCloudinary(avatarLocalPath);
+            if (!avatar.url) {
+                throw new ApiError(400, "Error while uploading avatar");
+            }
+            const user = await User.findByIdAndUpdate(
+                req.user._id,
+                {
+                    $set: {
+                        avatar: avatar.url
+                    }
+                },
+                { new: true }
+            ).select("-password");
+            return res
+                .status(200)
+                .json(new ApiResponse(200, user, "Avatar updated successfully"));
+        } catch (error) {
             throw new ApiError(400, "Error while uploading avatar");
         }
-        const user = await User.findByIdAndUpdate(
-            req.user._id,
-            {
-                $set: {
-                    avatar: avatar.url
-                }
-            },
-            { new: true }
-        ).select("-password");
-        return res
-            .status(200)
-            .json(new ApiResponse(200, user, "Avatar updated successfully"));
     });
 });
 
