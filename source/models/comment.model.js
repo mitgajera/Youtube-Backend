@@ -18,6 +18,11 @@ const CommentSchema = new Schema(
             ref: "User"
         },
 
+        createdAt: {
+            type: Date,
+            default: Date.now
+        },
+
         likes: [
             {
                 type: Schema.Types.ObjectId,
