@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Comment } from "../models/comment.model.js"
 import { Video } from "../models/video.model.js"
-import { ApiError } from "../utils/ApiError.js"
+import { ApiError } from "../utils/apiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 
 const getVideoComment = asyncHandler(async (req, res) => {
@@ -10,7 +10,7 @@ const getVideoComment = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     const { page = 1, limit = 10 } = req.query;
 
-    const video = await Video.finfById(videoId);
+    const video = await Video.findById(videoId);
     if (!video) {
         throw new ApiError(404, "Video not found");
     }
