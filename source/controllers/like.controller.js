@@ -1,4 +1,4 @@
-import mongoose, { isValidObjectId } from "mongoose"; 
+import mongoose, { isValidObjectId } from "mongoose";
 import { Like } from "../models/like.model.js";
 import { ApiError } from "../utils/apiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
@@ -118,11 +118,54 @@ const getLikedVideos = asyncHandler(async (req, res) => {
                         }
                     },
                     {
-                        $unwind: "$ownerDetails",
-                        
+                        $unwind: "$likedVideo"
+                    },
+                    {
+                        $sort: {
+                            createdAt: -1
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            $likedVideo: {
+                                _id: 1,
+                                "videoFile.url": 1,
+                                "thumbnail.url": 1,
+                                owner: 1,
+                                title: 1,
+                                description: 1,
+                                views: 1,
+                                createdAt: 1,
+                                isPublished: 1,
+                                ownerDetails: {
+                                    username: 1,
+                                    fullName: 1,
+                                    "avatar.url": 1
+                                }
+                            }
+                        }
                     }
                 ]
             }
         }
-    ])
-})
+    ]);
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                likedVideosAggregate,
+                "Liked videos fetched successfully"
+            )
+
+        );
+});
+
+export {
+    toggleVideoLike,
+    toggleCommentLike,
+    toggleCommunityLike,
+    getLikedVideos
+};

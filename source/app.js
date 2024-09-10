@@ -21,5 +21,6 @@ import likeRouter from "./routes/like.routes.js"
 
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/comment", commentRouter)
+app.use("/api/v1/like", likeRouter)
 
 export { app }

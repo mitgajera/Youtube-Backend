@@ -24,6 +24,6 @@ const communitySchema = new Schema(
 )
 
 
-communitySchema.plugins(mongooseAggregatePaginate)
+communitySchema.plugin(mongooseAggregatePaginate)
 
 export const Community = mongoose.model("Community", communitySchema)
