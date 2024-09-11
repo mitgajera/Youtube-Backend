@@ -15,7 +15,7 @@ import {
 const router = Router();        
 
 
-router.use(verifyJWT, upload.none());
+router.use(verifyJWT);
 
 router.route("/videoId").get(getVideoComment).post(addVideoComment);
 router.route("/commentId").delete(deleteVideoComment).patch(updateVideoComment);

@@ -38,7 +38,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     const { commentId } = req.params
 
     if (!isValidObjectId(commentId)) {
-        throw new ApiError(400, "Invalid video id")
+        throw new ApiError(400, "Invalid comment id")
     }
 
     const alreadyLiked = await Like.findOne({
@@ -68,7 +68,7 @@ const toggleCommunityLike = asyncHandler(async (req, res) => {
     const { communityId } = req.params;
 
     if (!isValidObjectId(communityId)) {
-        throw new AptError(400, "Invalid community id");
+        throw new ApiError(400, "Invalid community id");
     }
 
     const alreadyLiked = await Like.findOne({
@@ -91,7 +91,8 @@ const toggleCommunityLike = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, { isLiked: true }));
+        .json(
+            new ApiResponse(200, { isLiked: true }));
 });
 
 const getLikedVideos = asyncHandler(async (req, res) => {

@@ -94,6 +94,7 @@ const addVideoComment = asyncHandler(async (req, res) => {
 
     const { videoId } = req.params;
     const { content } = req.body;
+
     if (!content) {
         throw new ApiError(400, "Content is required");
     }
@@ -328,22 +329,22 @@ const deleteCommunityComment = asyncHandler(async (req, res) => {
     await communityComment.findOneAndDelete(commentId);
 
     return res
-        .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                "Community comment deleted successfully"
-            )
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "Community comment deleted successfully"
         )
+    )                                                                                                                                                                                                                                                                                                           
 });
 
 export {
-    getVideoComment,
-    addVideoComment,
-    updateVideoComment,
-    deleteVideoComment,
-    getCommunityComment,
-    addCommunityComment,
-    updateCommunityComment,
-    deleteCommunityComment
-}
+        getVideoComment,
+        addVideoComment,
+        updateVideoComment,
+        deleteVideoComment,
+        getCommunityComment,
+        addCommunityComment,
+        updateCommunityComment,
+        deleteCommunityComment
+    }
