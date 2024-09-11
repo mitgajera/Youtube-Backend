@@ -12,19 +12,15 @@ import {
     updateCommunityComment
 } from "../controllers/comment.controller.js"
 
-const router = Router();
+const router = Router();        
 
 
 router.use(verifyJWT, upload.none());
 
-router.route("/:videoId").get(getVideoComment);
-router.route("/:videoId").post(addVideoComment);
-router.route("/:videoId").delete(deleteVideoComment);
-router.route(":videoId").patch(updateVideoComment);
-router.route("/:communityId").get(getCommunityComment);
-router.route("/:communityId").post(addCommunityComment);
-router.route("/:communityId").delete(deleteCommunityComment);
-router.route("/:communityId").patch(updateCommunityComment);
+router.route("/videoId").get(getVideoComment).post(addVideoComment);
+router.route("/commentId").delete(deleteVideoComment).patch(updateVideoComment);
+router.route("/communityId").get(getCommunityComment).post(addCommunityComment);
+router.route("/commentId").delete(deleteCommunityComment).patch(updateCommunityComment);
 
 // http://localhost:8000/api/v1/comment/...
 

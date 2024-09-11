@@ -328,22 +328,22 @@ const deleteCommunityComment = asyncHandler(async (req, res) => {
     await communityComment.findOneAndDelete(commentId);
 
     return res
-    .status(200)
-    .json(
-        new ApiResponse(
-            200,
-            "Community comment deleted successfully"
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                "Community comment deleted successfully"
+            )
         )
-    )                                                                                                                                                                                                                                                                                                           
 });
 
 export {
-        getVideoComment,
-        addVideoComment,
-        updateVideoComment,
-        deleteVideoComment,
-        getCommunityComment,
-        addCommunityComment,
-        updateCommunityComment,
-        deleteCommunityComment
-    }
+    getVideoComment,
+    addVideoComment,
+    updateVideoComment,
+    deleteVideoComment,
+    getCommunityComment,
+    addCommunityComment,
+    updateCommunityComment,
+    deleteCommunityComment
+}
