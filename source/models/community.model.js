@@ -15,11 +15,10 @@ const communitySchema = new Schema(
 
         thumbnail: {
             type: String,
-            required: true
         },
-    }, 
+    },
     {
-    timestamps: true
+        timestamps: true
     }
 )
 

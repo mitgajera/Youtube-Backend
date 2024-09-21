@@ -364,15 +364,15 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
     try {
         const coverImage = await uploadOnCloudinary(coverImageLocalPath);
-    
+
         if (!coverImage.url) {
             throw new ApiError(400, "Error while uploading coverImage");
         }
-    
+
         const user = await User.findById(req.user._id).select("coverImage");
-    
+
         const coverImageToDelete = user.coverImage.public_id;
-    
+
         const updatedUser = await User.findByIdAndUpdate(
             req.user?._id,
             {
@@ -385,19 +385,17 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
             },
             { new: true }
         ).select("-password");
-    
+
         if (coverImageToDelete && updatedUser.coverImage.public_id) {
             await deleteOnCloudinary(coverImageToDelete);
         }
-    
+
         return res
             .status(200)
             .json(
                 new ApiResponse(200, updatedUser, "cover image update successfull")
             )
     } catch (error) {
-        console.error("Error uploading cover image to Cloudinary:", error.message);
-        console.error("Error uploading cover image to Cloudinary:", error.stack);
         throw new ApiError(400, "Error while uploading coverImage");
     }
 });
