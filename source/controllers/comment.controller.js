@@ -182,10 +182,10 @@ const deleteVideoComment = asyncHandler(async (req, res) => {
 });
 
 const getCommunityComment = asyncHandler(async (req, res) => {
-    const { communityId } = req.params;
+    const { postId } = req.params;
     const { page = 1, limit = 10 } = req.query;
 
-    const community = await Comment.findById(communityId);
+    const community = await Comment.findById(postId);
     if (!community) {
         throw new ApiError(404, "Community not found");
     }
@@ -193,7 +193,7 @@ const getCommunityComment = asyncHandler(async (req, res) => {
     const commentAggregate = Comment.aggregate([
         {
             $match: {
-                community: new mongoose.Types.objectId(communityId)
+                community: new mongoose.Types.ObjectId(postId)
             }
         },
         {
@@ -253,20 +253,20 @@ const getCommunityComment = asyncHandler(async (req, res) => {
 });
 
 const addCommunityComment = asyncHandler(async (req, res) => {
-    const { communityId } = req.params;
+    const { postId } = req.params;
     const { content } = req.body;
     if (!content) {
         throw new ApiError(400, "Content is required");
     }
 
-    const community = await Community.findById(communityId);
+    const community = await Community.findById(postId);
     if (!community) {
         throw new ApiError(404, "Community not found");
     }
 
     const comment = await Comment.create({
         content,
-        community: communityId,
+        post: postId,
         owner: req.user._id
     });
     if (!comment) {
@@ -279,14 +279,14 @@ const addCommunityComment = asyncHandler(async (req, res) => {
 });
 
 const updateCommunityComment = asyncHandler(async (req, res) => {
-    const { commentId } = req.params;
+    const { postId } = req.params;
     const { content } = req.body;
 
     if (!content) {
         throw new ApiError(400, "Content is required");
     }
 
-    const comment = await Comment.findById(commentId);
+    const comment = await Comment.findById(postId);
     if (!comment) {
         throw new ApiError(404, "Community comment not found");
     }

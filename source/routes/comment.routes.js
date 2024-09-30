@@ -17,14 +17,14 @@ const router = Router();
 
 router.use(verifyJWT);
 
-router.route("/:videoId").get(getVideoComment);
-router.route("/:videoId").post(addVideoComment);
-router.route("/:commentId").delete(deleteVideoComment);
-router.route("/:commentId").patch(updateVideoComment);
-router.route("/:communityId").get(getCommunityComment);
-router.route("/:communityId").post(addCommunityComment);
-router.route("/:commentId").delete(deleteCommunityComment);
-router.route("/:commentId").patch(updateCommunityComment);
+router.route("/v/:videoId").get(getVideoComment);
+router.route("/v/:videoId").post(addVideoComment);
+router.route("/v/:commentId").delete(deleteVideoComment);
+router.route("/v/:commentId").patch(updateVideoComment);
+router.route("/c/:postId").get(getCommunityComment);
+router.route("/c/:postId").post(addCommunityComment);
+router.route("/c/:commentId").delete(deleteCommunityComment);
+router.route("/c/:commentId").patch(updateCommunityComment);
 
 // http://localhost:8000/api/v1/comment/...
 

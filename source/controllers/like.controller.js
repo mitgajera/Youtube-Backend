@@ -65,19 +65,19 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 });
 
 const toggleCommunityLike = asyncHandler(async (req, res) => {
-    const { communityId } = req.params;
+    const { postId } = req.params;
 
-    if (!isValidObjectId(communityId)) {
+    if (!isValidObjectId(postId)) {
         throw new ApiError(400, "Invalid community id");
     }
 
     const alreadyLiked = await Like.findOne({
-        community: communityId,
+        post: postId,
         likedBy: req.user._id
     });
 
     if (alreadyLiked) {
-        await Like.findByIdAndDelete(likedAlready?._id);
+        await Like.findByIdAndDelete(alreadyLiked?._id);
 
         return res
             .status(200)
@@ -85,7 +85,7 @@ const toggleCommunityLike = asyncHandler(async (req, res) => {
     }
 
     await Like.create({
-        community: communityId,
+        post: postId,
         likedBy: req.user._id
     });
 
