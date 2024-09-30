@@ -12,8 +12,8 @@ const router = Router();
 router.use(verifyJWT);
 
 router.route("/toggle/v/:videoId").post(toggleVideoLike);
-router.route("/toggle/c/:videoId").post(toggleCommentLike);
-router.route("/:videos").get(getLikedVideos);
+router.route("/toggle/c/:commentId").post(toggleCommentLike);
+router.route("/videos").get(getLikedVideos);
 router.route("/toggle/cmt/:videoId").post(toggleCommunityLike);
 
 // http://localhost:8000/api/v1/like/...

@@ -17,7 +17,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     });
 
     if (alreadyLiked) {
-        await Like.findByIdAndDelete(likedAlready?._id);
+        await Like.findByIdAndDelete(alreadyLiked?._id);
 
         return res
             .status(200)
@@ -47,7 +47,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     });
 
     if (alreadyLiked) {
-        await Like.findByIdAndDelete(likedAlready?._id);
+        await Like.findByIdAndDelete(alreadyLiked?._id);
 
         return res
             .status(200)

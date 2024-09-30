@@ -25,7 +25,7 @@ import dashboardRouter from "./routes/dashboard.routes.js"
 import healthcheckRouter from "./routes/healthcheck.routes.js"
 import subscriptionRouter from "./routes/subscription.routes.js"
 import communityRouter from "./routes/community.routes.js"
-
+import videoRouter from "./routes/video.routes.js"
 
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/comment", commentRouter)
@@ -34,5 +34,6 @@ app.use("/api/v1/dashboard", dashboardRouter)
 app.use("/api/v1/healthcheck", healthcheckRouter)
 app.use("/api/v1/subscriptions", subscriptionRouter)
 app.use("/api/v1/community", communityRouter)
+app.use("/api/v1/video", videoRouter)
 
 export { app }

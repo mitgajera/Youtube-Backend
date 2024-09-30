@@ -8,12 +8,23 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 
 const createPost = asyncHandler(async (req, res) => {
-    const { postId } = req.params;
+    const { postId } = req.params
     let { content, thumbnail } = req.body;
+    console.log(postId);
+    
+
+    if (!postId || typeof postId !== 'string') {
+        throw new ApiError(400, "Post id is required and must be a string");
+    }
 
     if (!content) {
         throw new ApiError(400, "Content is required");
     }
+
+    if (!isValidObjectId(postId)) {
+        throw new ApiError(400, "Invalid post id");
+    }
+    
     if (req.files && req.files.thumbnail && req.files.thumbnail[0]) {
         const thumbnailLocalPath = req.files.thumbnail[0].path;
         thumbnail = await uploadOnCloudinary(thumbnailLocalPath);

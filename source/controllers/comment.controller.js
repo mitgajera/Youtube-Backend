@@ -20,7 +20,7 @@ const getVideoComment = asyncHandler(async (req, res) => {
     const commentAggregate = Comment.aggregate([
         {
             $match: {
-                video: new mongoose.Types.objectId(videoId)
+                video: new mongoose.Types.ObjectId(videoId)
             }
         },
         {
@@ -80,7 +80,7 @@ const getVideoComment = asyncHandler(async (req, res) => {
         limit: parseInt(limit, 10)
     }
 
-    const comment = await Comment.aggregatePaginate(
+    const comments = await Comment.aggregatePaginate(
         commentAggregate,
         options
     );
@@ -171,7 +171,7 @@ const deleteVideoComment = asyncHandler(async (req, res) => {
 
     await Comment.findOneAndDelete(commentId);
 
-    await Like.deleteMany({
+    await Comment.deleteOne({
         comment: commentId,
         likedBy: req.user
     })
